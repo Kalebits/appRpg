@@ -15,4 +15,7 @@ public partial class CadastroPersonagemView : ContentPage
         BindingContext = cadViewModel;
         Title = "Novo Personagem";
     }
+
+    
+
 }

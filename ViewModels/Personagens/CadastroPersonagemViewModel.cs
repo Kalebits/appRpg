@@ -11,6 +11,7 @@ using System.Windows.Input;
 
 namespace AppRpgEtec.ViewModels.Personagens
 {
+    [QueryProperty("PersonagemSelecionadoId", "pId")]
     public class CadastroPersonagemViewModel : BaseViewModel
     {
         private PersonagemService pService;
@@ -20,6 +21,22 @@ namespace AppRpgEtec.ViewModels.Personagens
         private int forca;
         private int defesa;
         private int inteligencia;
+
+        private string personagemSelecionadoId;
+
+        public string PersonagemSelecionadoId
+        { 
+            set
+            {
+                if (value != null)
+                {
+                    personagemSelecionadoId = Uri.UnescapeDataString(value);
+                    CarregarPersonagem();
+                }
+            }
+        }
+       
+       
 
         public ICommand SalvarCommand { get; }
         public ICommand CancelarCommand { get; set; }
@@ -98,10 +115,6 @@ namespace AppRpgEtec.ViewModels.Personagens
             }
         }
 
-
-
-
-
         private ObservableCollection<TipoClasse> listaTiposClasse;
 
         public ObservableCollection<TipoClasse> ListaTiposClasse
@@ -147,6 +160,10 @@ namespace AppRpgEtec.ViewModels.Personagens
             }
         }
 
+
+
+        
+
         public async Task SalvarPersonagem()
         {
             try
@@ -175,6 +192,26 @@ namespace AppRpgEtec.ViewModels.Personagens
             }
         }
 
+        public async void CarregarPersonagem()
+        {
+            try
+            {
+                Personagem p = await pService.GetPersonagemAsync(int.Parse(personagemSelecionadoId));
+
+                this.Nome = p.Nome;
+                this.pontosVida = p.PontosVida;
+                this.Defesa = p.Defesa;
+                this.Forca = p.Forca;
+                this.Inteligencia = p.Inteligencia;
+                this.Id = p.Id;
+
+                tipoClasseSelecionado = this.ListaTiposClasse.FirstOrDefault(TipoClasse => TipoClasse.Id == (int)p.Classe);
+            }
+            catch(Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+            }
+        }
 
     }
 }
